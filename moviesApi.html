@@ -1,0 +1,223 @@
+ <!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>movie search</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300&display=swap" rel="stylesheet">	
+	<style>
+		*{
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+			font-family: 'Source Sans Pro', sans-serif;
+		}
+		#wrapper{
+		
+		}
+		.container{
+			
+			position: relative;
+		}
+		.search {
+			padding-top: 3%;
+			padding-left: 22%;
+			/*margin-bottom: 10px;*/
+			background-color: #1f8fc6;
+			padding-bottom: 3%;
+
+		}
+		input{
+			width: 50%;
+			height: 40px;
+			border-radius: 10px;
+			padding:10px ;
+			background-color: #d9edff;
+		}
+		button{
+			background-color: #d9edff;
+			border-radius: 10px;
+			padding: 10px 35px;
+			
+		}
+		#popup{
+			z-index: -1;
+			opacity: 0;
+			position:fixed;
+			border: 2px solid black;
+			top:20%;
+			left:10%;
+			width:70%;
+			height:400px;
+			background: #0a0a75;
+		}
+		#popup span{
+			position: absolute;
+			top: 1%;
+			right: 1%;
+			color: #fff;
+			font-size: 2rem;
+		}
+		#box{
+			width: 90%;
+			margin: 0 auto;
+/*			background-color:#e6eef0;
+*/		}
+		h1{
+			font-size: 18px;
+		}
+		@media all and (max-width: 800px){
+			.search{
+				padding-left: 10%;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div id="wrapper">
+		<div class="container">
+			
+			<div class="search">
+				<input type="text" name="" placeholder="Enter movie name">
+				<button><b>Search</b></button>
+			</div>
+			<div id="box">
+				
+			</div>
+			<div id="popup">
+				<!-- <i class="fa-solid fa-xmark"></i> -->
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+	<script>
+		let button = document.querySelector("button");
+		let input = document.querySelector("input");
+		let img_path= "https://image.tmdb.org/t/p/original";
+		button.onclick =()=>{
+			if(input.value.length==0){
+				alert("enter movie name");
+			}
+			else{
+				// console.log(document.querySelector("#box").children);
+				if(document.querySelector("#box").childElementCount > 0){
+					Array.from(document.querySelector("#box").children).map((current) => {
+						current.remove();
+					})
+					// array.from creates an array from html collection here,and it is applicalbale on map
+				}
+				movie();
+			}
+
+			async function movie(current) {
+			let url ="https://api.themoviedb.org/3/search/movie?api_key=a83a38db2c8f8893152e7362621b07b6&language=en-US&query="+input.value+"&page=1&include_adult=false";
+
+				await fetch(url).then(response => response.json())
+				.then(data =>{
+					data.results.map((current) =>{
+						// console.log(current)
+						let box = document.querySelector("#box");
+						let div =document.createElement("div");
+						
+						div.style.cssText="width:250px;height:300px;box-shadow:0px 0px 2px 2px;padding:10px 20px;margin:10px;background-color: #d9edff;"
+						box.style.cssText="display:flex; justify-content:space-between; flex-wrap:wrap";
+						
+							
+						box.appendChild(div);
+						let h1 = document.createElement("h1");
+						div.appendChild(h1);
+						h1.innerHTML = current.title;
+						h1.style.cssText ="text-align:center;padding-bottom:10px"
+						let img = document.createElement("img");
+						img.setAttribute("src",img_path+current.poster_path);
+						img.setAttribute("height","170px");
+						img.setAttribute("width","210px");
+						div.appendChild(img)
+						let para =document.createElement("p");
+						div.appendChild(para);
+						para.innerHTML= "<b>Release Date:</b>"+current.release_date;
+						let para2 =document.createElement("p");
+						div.appendChild(para2);
+						para2.innerHTML= "<b>Rating:</b>"+current.vote_average;
+						div.onclick = ()=>{
+							if(document.querySelector("#popup").childElementCount > 0){
+								Array.from(document.querySelector("#popup").children).map((current) => {
+									current.remove();
+									})
+							}
+							let popup = document.querySelector("#popup");
+							popup.style.cssText="display:flex;jutify-content:space-between;z-index:999;opacity:1;"
+							let newdiv = document.createElement("div");
+							popup.appendChild(newdiv);
+							newdiv.style.cssText="";
+							let popupimg =document.createElement("img");
+							popupimg.setAttribute("src",img_path+current.poster_path);
+							popupimg.setAttribute("width","100%");
+							popupimg.setAttribute("height","100%");
+							newdiv.appendChild(popupimg);
+
+							newdiv.style.cssText="width:40%;height:90%;margin:auto auto"
+							let div2 = document.createElement("div");
+							popup.appendChild(div2);
+							div2.style.cssText="color:#fff;width:55%;height:90%;margin:auto auto"
+							let h1 =document.createElement("h1");
+							h1.innerHTML =current.title;
+							h1.style.cssText="margin-bottom:10px;";
+							div2.appendChild(h1);
+							let para =document.createElement("p")
+							let para2 =document.createElement("p")
+							para.innerHTML= "<b>Release Date : </b>"+current.release_date;
+							para2.innerHTML="Overview : "+current.overview;
+							para.style.cssText="margin-bottom:10px";
+							div2.appendChild(para);
+							div2.appendChild(para2);
+							let id =current.id;
+							let video_tag = document.createElement("iframe");
+							video_tag.style.cssText="width:100%;height:60%;margin-top:1%;"
+							div2.appendChild(video_tag);
+							fetch("https://api.themoviedb.org/3/movie/"+id+"/videos?api_key=76d0e7c7157a5f32e858156bc6cc87e6&language=en-US")
+							.then(response=>response.json())
+							.then((data)=>{
+								// console.log(data)
+								data.results.map((current)=>{
+									let key =current.key;
+									let youtube ="https://www.youtube.com/embed/";
+									console.log(key)
+									
+									video_tag.setAttribute("src",youtube+key)
+
+								})
+							})
+							let span =document.createElement("span");
+							span.setAttribute("class","fa-solid fa-xmark");
+							popup.appendChild(span);
+							span.onclick =()=>{
+								popup.style.cssText="z-index:-1;opacity:0;"	
+								video_tag.setAttribute("src","")
+							}
+
+						}
+
+
+					});
+
+				} 
+					
+
+				
+			)}
+
+		}
+
+
+
+	</script>
+</body>
+</html>
